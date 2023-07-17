@@ -110,13 +110,16 @@ def forecast_prophet(df: pd.DataFrame) -> pd.DataFrame:
 def concat_data(
     wb_df: pd.DataFrame, arima_df: pd.DataFrame, prophet_df: pd.DataFrame
 ) -> pd.DataFrame:
-    forecast_df = pd.concat([prophet_df, arima_df], axis=1)
-    # I will not use .values to vectorize few rows of data
-    forecast_df["value"] = (
-        forecast_df["prophet_value"] + forecast_df["arima_values"]
-    ) / 2.0
-    forecast_df["source"] = "Forecast"
-    forecast_df = forecast_df.drop(["prophet_value", "arima_values"], axis=1)
+
+    forecast_df = (
+        pd.concat([prophet_df, arima_df], axis=1)
+        .assign(
+            value=lambda df: (df["prophet_value"] + df["arima_values"]) / 2.0,
+            source="Forecast"
+        )
+        .drop(["prophet_value", "arima_values"], axis=1)
+    )
+
     union_df = pd.concat([wb_df, forecast_df], axis=0)
     union_df.index = union_df.index.strftime("%Y-%m-%d")
     logging.info("Data merged.")
