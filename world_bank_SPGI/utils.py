@@ -99,11 +99,10 @@ def forecast_prophet(df: pd.DataFrame) -> pd.DataFrame:
     forecast = model.predict(future)
     forecast_df = pd.DataFrame(
         {
-            "date": pd.to_datetime(forecast["ds"]) + pd.Timedelta(days=1),
+            "date": forecast["ds"] + pd.Timedelta(days=1),
             "prophet_value": pd.to_numeric(forecast["yhat"]),
         }
-    )
-    forecast_df = forecast_df.set_index("date")
+    ).set_index("date")
     logging.info("Prophet forecast done.")
     return forecast_df
 
