@@ -110,12 +110,11 @@ def forecast_prophet(df: pd.DataFrame) -> pd.DataFrame:
 def concat_data(
     wb_df: pd.DataFrame, arima_df: pd.DataFrame, prophet_df: pd.DataFrame
 ) -> pd.DataFrame:
-
     forecast_df = (
         pd.concat([prophet_df, arima_df], axis=1)
         .assign(
             value=lambda df: (df["prophet_value"] + df["arima_values"]) / 2.0,
-            source="Forecast"
+            source="Forecast",
         )
         .drop(["prophet_value", "arima_values"], axis=1)
     )
@@ -130,7 +129,7 @@ def count_source_rows(df: pd.DataFrame, source_name: str) -> str:
     return str(df[df.source == source_name].shape[0])
 
 
-def create_direction() -> str:
+def create_direction() -> Path:
     path = Path(__file__).parents[1] / "_output"
     path.mkdir(parents=True, exist_ok=True)
     return path
